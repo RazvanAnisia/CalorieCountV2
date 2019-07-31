@@ -31,3 +31,9 @@
     transform: rotate(360deg);
   }
 }
+
+
+.camera-container {
+  max-width:500px;
+  max-height: 500px;
+}
