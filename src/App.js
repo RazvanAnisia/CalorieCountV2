@@ -24,9 +24,10 @@ PHASE:3
 
 import React, { Component } from 'react';
 import './App.css';
-// import Quagga from 'quagga'; // ES6
 import ErrorBoundary from './ErrorBoundary';
 import withBarcode from './hoc/withBarcode';
+import { connect } from 'react-redux';
+import { fetchFoodFactsData } from './actions/ActionFoodFacts';
 
 class App extends Component {
   state = {
@@ -47,11 +48,24 @@ class App extends Component {
   };
 
   render() {
+    const {
+      fetchFoodFactsData,
+      bLoading,
+      nstrError,
+      arrFoodfacts
+    } = this.props;
     return (
       <div className="App">
         <p>Find your food products</p>
         <button onClick={this.props.initiateBarcodeDetection}>Start</button>
         <button onClick={this.props.stopBarcodeDetection}>Stop</button>
+        <button onClick={fetchFoodFactsData}>Food Facts</button>
+        <br></br>
+        {bLoading ? 'Loading..' : null}
+        {nstrError ? nstrError.message : null}
+        {arrFoodfacts
+          ? arrFoodfacts.map(product => <li>{product.title}</li>)
+          : null}
         <div
           className="camera-container"
           style={this.props.hideCamera ? { display: 'none' } : null}
@@ -102,4 +116,18 @@ class App extends Component {
   }
 }
 
-export default withBarcode(App);
+const mapStateToProps = (state, ownProps) => {
+  return {
+    bLoading: state.foodfactsReducer.bLoading,
+    nstrError: state.foodfactsReducer.nstrError,
+    arrFoodfacts: state.foodfactsReducer.arrFoodfacts
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchFoodFactsData: () => dispatch(fetchFoodFactsData())
+  };
+};
+
+export default withBarcode(connect(mapStateToProps, mapDispatchToProps)(App));
