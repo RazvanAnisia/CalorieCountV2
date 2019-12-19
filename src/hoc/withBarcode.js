@@ -115,6 +115,7 @@ const withBarcode = Wrapped => {
     render() {
       return (
         <Wrapped
+          {...this.props}
           stopBarcodeDetection={this.stopBarcodeDetection}
           initiateBarcodeDetection={this.initiateBarcodeDetection}
           {...this.state}

@@ -28,6 +28,10 @@ import ErrorBoundary from './ErrorBoundary';
 import withBarcode from './hoc/withBarcode';
 import { connect } from 'react-redux';
 import { fetchFoodFactsData } from './actions/ActionFoodFacts';
+import Button from '@material-ui/core/Button';
+import { withStyles } from '@material-ui/core/styles';
+import AccessAlarmIcon from '@material-ui/icons/AccessAlarm';
+import { List, ListItem, ListItemText } from '@material-ui/core';
 
 class App extends Component {
   state = {
@@ -52,14 +56,24 @@ class App extends Component {
       fetchFoodFactsData,
       bLoading,
       nstrError,
-      arrFoodfacts
+      arrFoodfacts,
+      classes
     } = this.props;
+
+    console.log(classes);
     return (
       <div className="App">
-        <p>Find your food products</p>
-        <button onClick={this.props.initiateBarcodeDetection}>Start</button>
-        <button onClick={this.props.stopBarcodeDetection}>Stop</button>
-        <button onClick={fetchFoodFactsData}>Food Facts</button>
+        <p className={classes.headline}>Find your food products</p>
+        <Button onClick={this.props.initiateBarcodeDetection} color="primary">
+          Start
+        </Button>
+        <Button onClick={this.props.stopBarcodeDetection} color="secondary">
+          Stop
+        </Button>
+        <Button onClick={fetchFoodFactsData} variant="contained">
+          Food Facts
+        </Button>
+
         <br></br>
         {bLoading ? 'Loading..' : null}
         {nstrError ? nstrError.message : null}
@@ -84,11 +98,16 @@ class App extends Component {
             {this.props.productCategories ? (
               <p>Category:{this.props.productCategories}</p>
             ) : null}
-            {this.props.productKeywords
-              ? this.props.productKeywords.map((keyword, index) => (
-                  <li key="index">{keyword}</li>
-                ))
-              : null}
+            <List aria-label="main mailbox folders">
+              {this.props.productKeywords
+                ? this.props.productKeywords.map((keyword, index) => (
+                    <ListItem key="index">
+                      <ListItemText primary={keyword} />
+                    </ListItem>
+                  ))
+                : null}
+            </List>
+
             {this.props.productPhoto ? (
               <img src={this.props.productPhoto} alt={'productPhoto'} />
             ) : null}
@@ -130,4 +149,12 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default withBarcode(connect(mapStateToProps, mapDispatchToProps)(App));
+const style = {
+  headline: {
+    fontSize: '20px;'
+  }
+};
+
+export default withStyles(style)(
+  withBarcode(connect(mapStateToProps, mapDispatchToProps)(App))
+);
