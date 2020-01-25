@@ -39,7 +39,7 @@ class App extends Component {
   };
 
   addProduct = () => {
-    console.log('adding product');
+    // console.log('adding product');
     const { productName, productPhoto, productCategories } = this.props;
     this.setState(() => {
       return {
