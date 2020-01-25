@@ -137,6 +137,7 @@ class App extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    ...ownProps,
     bLoading: state.foodfactsReducer.bLoading,
     nstrError: state.foodfactsReducer.nstrError,
     arrFoodfacts: state.foodfactsReducer.arrFoodfacts
