@@ -1,5 +1,6 @@
 import axios from 'axios';
-
+import { FOOD_FACTS_URL } from '../util/apiConfig';
+console.log(FOOD_FACTS_URL);
 export const FETCH_START = 'FETCH_START';
 export const RECEIVED_FOODFACTS_DATA = 'RECEIVED_FOODFACTS_DATA';
 export const FETCH_ERROR = 'FETCH_ERROR';
@@ -34,9 +35,8 @@ export const receivedFoodfactsData = payload => {
 export const fetchFoodFactsData = () => {
   return dispatch => {
     dispatch(fetchStart());
-    console.log(process.env.REACT_APP_API_ENDPOINT);
     return axios
-      .get(process.env.REACT_APP_API_ENDPOINT)
+      .get(FOOD_FACTS_URL)
       .then(function(response) {
         console.log(response);
         dispatch(receivedFoodfactsData(response.data));
