@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import './App.css';
 import withBarcode from './hoc/withBarcode';
 import { connect } from 'react-redux';
 import { fetchFoodFactsData } from './actions/ActionFoodFacts';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 import { List, ListItem, ListItemText } from '@material-ui/core';
+import PropTypes from 'prop-types';
+
 class App extends Component {
   state = {
     addedProducts: []
@@ -124,6 +125,10 @@ const style = {
   headline: {
     fontSize: '20px;'
   }
+};
+
+App.propTypes = {
+  hideCamera: PropTypes.bool
 };
 
 export default withStyles(style)(

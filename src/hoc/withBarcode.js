@@ -55,6 +55,34 @@ const withBarcode = Wrapped => {
     };
 
     initiateBarcodeDetection = () => {
+      const objConfig = {
+        inputStream: {
+          name: 'Live',
+          type: 'LiveStream',
+          target: document.querySelector('.camera-container')
+        },
+        numOfWorkers: 1,
+        decoder: {
+          readers: [
+            'ean_reader',
+            'code_128_reader',
+            'ean_8_reader',
+            'code_39_reader',
+            'code_39_vin_reader',
+            'codabar_reader',
+            'upc_reader',
+            'upc_e_reader',
+            'i2of5_reader'
+          ]
+        },
+        locate: true,
+        debug: {
+          drawBoundingBox: true,
+          showFrequency: true,
+          drawScanline: true,
+          showPattern: true
+        }
+      };
       if (
         // safely access `navigator.mediaDevices.getUserMedia`
         navigator.mediaDevices &&
@@ -69,37 +97,7 @@ const withBarcode = Wrapped => {
           hideCamera: false
         });
       }
-      Quagga.init(
-        {
-          inputStream: {
-            name: 'Live',
-            type: 'LiveStream',
-            target: document.querySelector('.camera-container')
-          },
-          numOfWorkers: 1,
-          decoder: {
-            readers: [
-              'ean_reader',
-              'code_128_reader',
-              'ean_8_reader',
-              'code_39_reader',
-              'code_39_vin_reader',
-              'codabar_reader',
-              'upc_reader',
-              'upc_e_reader',
-              'i2of5_reader'
-            ]
-          },
-          locate: true,
-          debug: {
-            drawBoundingBox: true,
-            showFrequency: true,
-            drawScanline: true,
-            showPattern: true
-          }
-        },
-        this.handleInit
-      );
+      Quagga.init(objConfig, this.handleInit);
     };
 
     stopBarcodeDetection = () => {

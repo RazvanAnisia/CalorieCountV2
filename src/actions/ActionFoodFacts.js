@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { FOOD_FACTS_URL } from '../util/apiConfig';
-console.log(FOOD_FACTS_URL);
+
 export const FETCH_START = 'FETCH_START';
 export const RECEIVED_FOODFACTS_DATA = 'RECEIVED_FOODFACTS_DATA';
 export const FETCH_ERROR = 'FETCH_ERROR';
