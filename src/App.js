@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
-import ErrorBoundary from './ErrorBoundary';
 import withBarcode from './hoc/withBarcode';
 import { connect } from 'react-redux';
 import { fetchFoodFactsData } from './actions/ActionFoodFacts';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
-import AccessAlarmIcon from '@material-ui/icons/AccessAlarm';
 import { List, ListItem, ListItemText } from '@material-ui/core';
 class App extends Component {
   state = {
@@ -58,52 +56,50 @@ class App extends Component {
           className="camera-container"
           style={this.props.hideCamera ? { display: 'none' } : null}
         />
-        <ErrorBoundary>
-          <div className="product-container">
-            {this.props.productName ? (
-              <div>
-                <p>
-                  Product name:
-                  <strong>{this.props.productName}</strong>
-                </p>
-                <button onClick={this.addProduct}>Add Product</button>
-              </div>
-            ) : null}
-            {this.props.productCategories ? (
-              <p>Category:{this.props.productCategories}</p>
-            ) : null}
-            <List aria-label="main mailbox folders">
-              {this.props.productKeywords
-                ? this.props.productKeywords.map((keyword, index) => (
-                    <ListItem key="index">
-                      <ListItemText primary={keyword} />
-                    </ListItem>
-                  ))
-                : null}
-            </List>
-
-            {this.props.productPhoto ? (
-              <img src={this.props.productPhoto} alt={'productPhoto'} />
-            ) : null}
-          </div>
-          <div className="summary">
-            Added products:
-            {this.state.addedProducts
-              ? this.state.addedProducts.map((prod, index) => (
-                  <>
-                    <div>
-                      <span key={index}>{prod.productName}</span>
-                      <img
-                        style={{ width: '30px' }}
-                        src={prod.productPhoto}
-                        alt={'product'}
-                      />
-                    </div>
-                  </>
+        <div className="product-container">
+          {this.props.productName ? (
+            <div>
+              <p>
+                Product name:
+                <strong>{this.props.productName}</strong>
+              </p>
+              <button onClick={this.addProduct}>Add Product</button>
+            </div>
+          ) : null}
+          {this.props.productCategories ? (
+            <p>Category:{this.props.productCategories}</p>
+          ) : null}
+          <List aria-label="main mailbox folders">
+            {this.props.productKeywords
+              ? this.props.productKeywords.map((keyword, index) => (
+                  <ListItem key="index">
+                    <ListItemText primary={keyword} />
+                  </ListItem>
                 ))
               : null}
-          </div>
-        </ErrorBoundary>
+          </List>
+
+          {this.props.productPhoto ? (
+            <img src={this.props.productPhoto} alt={'productPhoto'} />
+          ) : null}
+        </div>
+        <div className="summary">
+          Added products:
+          {this.state.addedProducts
+            ? this.state.addedProducts.map((prod, index) => (
+                <>
+                  <div>
+                    <span key={index}>{prod.productName}</span>
+                    <img
+                      style={{ width: '30px' }}
+                      src={prod.productPhoto}
+                      alt={'product'}
+                    />
+                  </div>
+                </>
+              ))
+            : null}
+        </div>
       </div>
     );
   }
