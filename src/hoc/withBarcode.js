@@ -2,7 +2,13 @@ import Quagga from 'quagga'; // ES6
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchFoodFactsData } from '../actions/ActionFoodFacts';
+import { withSnackbar } from 'notistack';
 
+/**
+ *
+ * @param {Component} Wrapped Component that will be wrapped
+ * @return {JSX} withBarcode
+ */
 const withBarcode = Wrapped => {
   class withBarcode extends Component {
     state = {
@@ -13,38 +19,10 @@ const withBarcode = Wrapped => {
       bCameraHidden: true
     };
 
-    handleInit = err => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log('Initialization finished. Ready to scan');
-      Quagga.onDetected(data => {
-        data.codeResult
-          ? console.log(data.codeResult.code)
-          : console.log('nope');
-        const productCode = data.codeResult.code;
-        if (productCode) {
-          fetch(`https://world.openfoodfacts.org/api/v0/product/${productCode}`)
-            .then(res => res.json())
-            .then(data => {
-              if (data.status_verbose === 'product found') {
-                console.log(data.product);
-                this.setState({
-                  strProductName: data.product.product_name,
-                  strProductPhoto: data.product.image_front_url,
-                  strProductCategories: data.product.categories,
-                  arrProductKeywords: data.product._keywords,
-                  bCameraHidden: true
-                });
-                Quagga.stop();
-              }
-            });
-        }
-      });
-      Quagga.start();
-    };
-
+    /**
+     * @description Instantiate Quagga instance and live camera feed
+     * @return {void}
+     */
     initiateBarcodeDetection = () => {
       const objConfig = {
         inputStream: {
@@ -74,12 +52,11 @@ const withBarcode = Wrapped => {
           showPattern: true
         }
       };
+
       if (
-        // safely access `navigator.mediaDevices.getUserMedia`
         navigator.mediaDevices &&
         typeof navigator.mediaDevices.getUserMedia === 'function'
       ) {
-        //reset the state
         this.setState({
           strProductName: '',
           strProductPhoto: '',
@@ -91,6 +68,45 @@ const withBarcode = Wrapped => {
       Quagga.init(objConfig, this.handleInit);
     };
 
+    /**
+     * @description Callback for when QUAGGA is successfully initialised
+     * @return {void}
+     */
+    handleInit = () => {
+      const { enqueueSnackbar, fetchFoodFactsData } = this.props;
+      enqueueSnackbar('Ready to scan');
+
+      console.log(fetchFoodFactsData);
+
+      Quagga.onDetected(data => {
+        data.codeResult
+          ? enqueueSnackbar('Found possible match')
+          : enqueueSnackbar('Could not find match');
+        const productCode = data.codeResult.code;
+        if (productCode) {
+          // fetchFoodFactsData();
+          fetch(`https://world.openfoodfacts.org/api/v0/product/${productCode}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.status_verbose === 'product found') {
+                this.setState({
+                  strProductName: data.product.product_name,
+                  strProductPhoto: data.product.image_front_url,
+                  strProductCategories: data.product.categories,
+                  arrProductKeywords: data.product._keywords,
+                  bCameraHidden: true
+                });
+                Quagga.stop();
+              }
+            });
+        }
+      });
+      Quagga.start();
+    };
+
+    /**
+     * @description Stops the quagga instance and hides the camera
+     */
     stopBarcodeDetection = () => {
       Quagga.stop();
       this.setState({
@@ -118,7 +134,7 @@ const withBarcode = Wrapped => {
       ...ownProps,
       bLoading: state.foodfactsReducer.bLoading,
       nstrError: state.foodfactsReducer.nstrError,
-      arrFoodfacts: state.foodfactsReducer.arrFoodfacts
+      objFoodfacts: state.foodfactsReducer.objFoodfacts
     };
   };
 
@@ -127,7 +143,9 @@ const withBarcode = Wrapped => {
       fetchFoodFactsData: () => dispatch(fetchFoodFactsData())
     };
   };
-  return connect(mapStateToProps, mapDispatchToProps)(withBarcode);
+  return withSnackbar(
+    connect(mapStateToProps, mapDispatchToProps)(withBarcode)
+  );
 };
 
 export default withBarcode;

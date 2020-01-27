@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import withBarcode from './hoc/withBarcode';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
-import { List, ListItem, ListItemText } from '@material-ui/core';
 import PropTypes from 'prop-types';
+import { Camera, ScanProduct } from './components';
 
 class App extends Component {
   state = {
@@ -28,10 +28,9 @@ class App extends Component {
 
   render() {
     const {
-      fetchFoodFactsData,
       bLoading,
       nstrError,
-      arrFoodfacts,
+      objFoodfacts,
       classes,
       initiateBarcodeDetection,
       stopBarcodeDetection,
@@ -41,8 +40,6 @@ class App extends Component {
       bCameraHidden,
       strProductName
     } = this.props;
-
-    console.log(bCameraHidden);
 
     const { addedProducts } = this.state;
     return (
@@ -54,45 +51,13 @@ class App extends Component {
         <Button onClick={stopBarcodeDetection} color="secondary">
           Stop
         </Button>
-        <Button onClick={fetchFoodFactsData} variant="contained">
-          Food Facts
-        </Button>
-
-        <br></br>
-        {bLoading ? 'Loading..' : null}
-        {nstrError ? nstrError.message : null}
-        {arrFoodfacts
-          ? arrFoodfacts.map(product => <li>{product.title}</li>)
-          : null}
-        <div
-          id="camera-container"
-          className={bCameraHidden ? classes.hidden : classes.cameraContainer}
+        <Camera bCameraHidden={bCameraHidden} />
+        <ScanProduct
+          strProductName={strProductName}
+          strProductPhoto={strProductPhoto}
+          strProductCategories={strProductCategories}
+          arrProductKeywords={arrProductKeywords}
         />
-        <div className="product-container">
-          {strProductName ? (
-            <div>
-              <p>
-                Product name:
-                <strong>{strProductName}</strong>
-              </p>
-              <button onClick={this.addProduct}>Add Product</button>
-            </div>
-          ) : null}
-          {strProductCategories ? <p>Category:{strProductCategories}</p> : null}
-          <List aria-label="main mailbox folders">
-            {arrProductKeywords
-              ? arrProductKeywords.map((keyword, index) => (
-                  <ListItem key="index">
-                    <ListItemText primary={keyword} />
-                  </ListItem>
-                ))
-              : null}
-          </List>
-
-          {strProductPhoto ? (
-            <img src={strProductPhoto} alt={'strProductPhoto'} />
-          ) : null}
-        </div>
         <div className="summary">
           Added products:
           {addedProducts
@@ -118,13 +83,6 @@ class App extends Component {
 const styles = {
   headline: {
     fontSize: 20
-  },
-  hidden: {
-    display: 'none'
-  },
-  cameraContainer: {
-    width: 300,
-    height: 400
   }
 };
 

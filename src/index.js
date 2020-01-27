@@ -5,11 +5,14 @@ import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import store from './store';
 import 'typeface-roboto';
+import { SnackbarProvider } from 'notistack';
 
 ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
+  <SnackbarProvider maxSnack={2}>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </SnackbarProvider>,
   document.getElementById('root')
 );
 

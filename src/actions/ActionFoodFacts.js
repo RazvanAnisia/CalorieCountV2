@@ -1,53 +1,42 @@
 import axios from 'axios';
 import { FOOD_FACTS_URL } from '../util/apiConfig';
 
-export const FETCH_START = 'FETCH_START';
-export const RECEIVED_FOODFACTS_DATA = 'RECEIVED_FOODFACTS_DATA';
-export const FETCH_ERROR = 'FETCH_ERROR';
-export const FETCH_END = 'FETCH_END ';
+export const FOODFACTS_START_FETCH = 'FOODFACTS_START_FETCH';
+export const FOODFACTS_FETCH_SUCCESS = 'FOODFACTS_FETCH_SUCCESS';
+export const FOODFACTS_FETCH_FAILURE = 'FOODFACTS_FETCH_FAILURE';
 
-export const fetchStart = () => {
+export const foodfactsFetchStart = () => {
   return {
-    type: FETCH_START
+    type: FOODFACTS_START_FETCH
   };
 };
 
-export const fetchError = error => {
+export const foodfactsFetchFailure = error => {
   return {
-    type: FETCH_ERROR,
+    type: FOODFACTS_FETCH_FAILURE,
     payload: error
   };
 };
 
-export const fetchEnd = () => {
+export const foodfactsFetchSuccess = payload => {
   return {
-    type: FETCH_END
-  };
-};
-
-export const receivedFoodfactsData = payload => {
-  return {
-    type: RECEIVED_FOODFACTS_DATA,
+    type: FOODFACTS_FETCH_SUCCESS,
     payload: payload
   };
 };
 
-export const fetchFoodFactsData = () => {
+export const fetchFoodFactsData = strProductCode => {
   return dispatch => {
-    dispatch(fetchStart());
+    dispatch(foodfactsFetchStart());
     return axios
-      .get(FOOD_FACTS_URL)
-      .then(function(response) {
+      .get(`${FOOD_FACTS_URL}/${strProductCode}`)
+      .then(response => {
         console.log(response);
-        dispatch(receivedFoodfactsData(response.data));
+        dispatch(foodfactsFetchSuccess(response.data));
       })
-      .catch(function(error) {
+      .catch(error => {
         console.log(error);
-        dispatch(fetchError(error));
-      })
-      .finally(function() {
-        // always executed
-        dispatch(fetchEnd());
+        dispatch(foodfactsFetchFailure(error));
       });
   };
 };
