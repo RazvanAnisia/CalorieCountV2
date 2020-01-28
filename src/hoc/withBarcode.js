@@ -1,65 +1,34 @@
-import Quagga from 'quagga'; // ES6
+import Quagga from 'quagga';
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { fetchFoodFactsData } from '../actions/ActionFoodFacts';
+import { withSnackbar } from 'notistack';
 
+/**
+ *
+ * @param {Component} Wrapped Component that will be wrapped
+ * @return {JSX} withBarcode
+ */
 const withBarcode = Wrapped => {
   class withBarcode extends Component {
     state = {
-      productName: null,
-      productPhoto: null,
-      productCategories: null,
-      productKeywords: null,
-      hideCamera: true
+      strProductName: null,
+      strProductPhoto: null,
+      strProductCategories: null,
+      arrProductKeywords: null,
+      bCameraHidden: true
     };
 
-    handleInit = err => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log('Initialization finished. Ready to scan');
-      Quagga.onDetected(data => {
-        data.codeResult
-          ? console.log(data.codeResult.code)
-          : console.log('nope');
-        const productCode = data.codeResult.code;
-        if (productCode) {
-          fetch(`https://world.openfoodfacts.org/api/v0/product/${productCode}`)
-            .then(res => res.json())
-            .then(data => {
-              if (data.status_verbose === 'product found') {
-                console.log(data.product);
-                this.setState({
-                  productName: data.product.product_name,
-                  productPhoto: data.product.image_front_url,
-                  productCategories: data.product.categories,
-                  productKeywords: data.product._keywords,
-                  hideCamera: true
-                });
-                Quagga.stop();
-              }
-            });
-        }
-      });
-      /*
-          What I could do here, is take the result, wait for 1-2 seconds, and keep checking if the result is the same,if not then update the value
-           and use it to fetch frokm the food facts api
-          If I have a result then I display it, if not, then keep trying the code from the barcode
-          In case the code was moved and it can be read better now.
-          Again, test, if no result keep repeating.If we do get one, then stop the quagga process and the camera live
-          session
-                */
-      // Quagga.onProcessed(function callback(data){
-      //   console.log(data)
-      // })
-      Quagga.start();
-    };
-
+    /**
+     * @description Instantiate Quagga instance and live camera feed
+     * @return {void}
+     */
     initiateBarcodeDetection = () => {
       const objConfig = {
         inputStream: {
           name: 'Live',
           type: 'LiveStream',
-          target: document.querySelector('.camera-container')
+          target: document.querySelector('#camera-container')
         },
         numOfWorkers: 1,
         decoder: {
@@ -83,30 +52,69 @@ const withBarcode = Wrapped => {
           showPattern: true
         }
       };
+
       if (
-        // safely access `navigator.mediaDevices.getUserMedia`
         navigator.mediaDevices &&
         typeof navigator.mediaDevices.getUserMedia === 'function'
       ) {
-        //reset the state
         this.setState({
-          productName: '',
-          productPhoto: '',
-          productCategories: '',
-          productKeywords: '',
-          hideCamera: false
+          strProductName: '',
+          strProductPhoto: '',
+          strProductCategories: '',
+          arrProductKeywords: '',
+          bCameraHidden: false
         });
       }
       Quagga.init(objConfig, this.handleInit);
     };
 
+    /**
+     * @description Callback for when QUAGGA is successfully initialised
+     * @return {void}
+     */
+    handleInit = () => {
+      const { enqueueSnackbar, fetchFoodFactsData } = this.props;
+      enqueueSnackbar('Ready to scan');
+
+      console.log(fetchFoodFactsData);
+
+      Quagga.onDetected(data => {
+        data.codeResult
+          ? enqueueSnackbar('Found possible match')
+          : enqueueSnackbar('Could not find match');
+        const productCode = data.codeResult.code;
+        if (productCode) {
+          // fetchFoodFactsData();
+          fetch(`https://world.openfoodfacts.org/api/v0/product/${productCode}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.status_verbose === 'product found') {
+                this.setState({
+                  strProductName: data.product.product_name,
+                  strProductPhoto: data.product.image_front_url,
+                  strProductCategories: data.product.categories,
+                  arrProductKeywords: data.product._keywords,
+                  bCameraHidden: true
+                });
+                Quagga.stop();
+              }
+            });
+        }
+      });
+      Quagga.start();
+    };
+
+    /**
+     * @description Stops the quagga instance and hides the camera
+     */
     stopBarcodeDetection = () => {
       Quagga.stop();
       this.setState({
-        productCategories: '',
-        productKeywords: '',
-        productName: '',
-        productPhoto: ''
+        strProductCategories: '',
+        arrProductKeywords: '',
+        strProductName: '',
+        strProductPhoto: '',
+        bCameraHidden: true
       });
     };
 
@@ -121,7 +129,23 @@ const withBarcode = Wrapped => {
       );
     }
   }
-  return withBarcode;
+  const mapStateToProps = (state, ownProps) => {
+    return {
+      ...ownProps,
+      bLoading: state.foodfactsReducer.bLoading,
+      nstrError: state.foodfactsReducer.nstrError,
+      objFoodfacts: state.foodfactsReducer.objFoodfacts
+    };
+  };
+
+  const mapDispatchToProps = dispatch => {
+    return {
+      fetchFoodFactsData: () => dispatch(fetchFoodFactsData())
+    };
+  };
+  return withSnackbar(
+    connect(mapStateToProps, mapDispatchToProps)(withBarcode)
+  );
 };
 
 export default withBarcode;

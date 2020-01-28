@@ -5,11 +5,19 @@ import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import store from './store';
 import 'typeface-roboto';
+import { SnackbarProvider } from 'notistack';
+import { ThemeProvider } from '@material-ui/core/styles';
+import theme from './MaterialUi/Theme';
+import './MaterialUi/amends.css';
 
 ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
+  <ThemeProvider theme={theme}>
+    <SnackbarProvider maxSnack={2}>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </SnackbarProvider>
+  </ThemeProvider>,
   document.getElementById('root')
 );
 

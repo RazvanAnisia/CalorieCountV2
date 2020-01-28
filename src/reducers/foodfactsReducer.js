@@ -1,41 +1,35 @@
 import {
-  RECEIVED_FOODFACTS_DATA,
-  FETCH_START,
-  FETCH_ERROR,
-  FETCH_END
+  FOODFACTS_FETCH_FAILURE,
+  FOODFACTS_START_FETCH,
+  FOODFACTS_FETCH_SUCCESS
 } from '../actions/ActionFoodFacts';
 
 const objInitialState = {
   bLoading: false,
   nstrError: null,
-  arrFoodfacts: []
+  objFoodfacts: {}
 };
 
 export default function foodFactsReducer(state = objInitialState, action) {
   switch (action.type) {
-    case FETCH_START:
+    case FOODFACTS_START_FETCH:
       return {
         ...state,
         bLoading: true,
         nstrError: null
       };
-    case RECEIVED_FOODFACTS_DATA:
+    case FOODFACTS_FETCH_SUCCESS:
       return {
         ...state,
-        arrFoodfacts: action.payload,
+        objFoodfacts: action.payload,
         bLoading: false,
         nstrError: null
       };
-    case FETCH_ERROR:
+    case FOODFACTS_FETCH_FAILURE:
       return {
         ...state,
         bLoading: false,
         nstrError: action.payload
-      };
-    case FETCH_END:
-      return {
-        ...state,
-        bLoading: false
       };
     default:
       return state;
