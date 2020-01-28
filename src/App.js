@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import withBarcode from './hoc/withBarcode';
+import { withBarcode, withModal } from './hoc';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import { Camera, ScanProduct } from './components';
+import { ModalComponent } from './components/UI';
+import palette from './MaterialUi/Palette';
 
 class App extends Component {
   state = {
@@ -38,26 +40,38 @@ class App extends Component {
       arrProductKeywords,
       strProductPhoto,
       bCameraHidden,
-      strProductName
+      strProductName,
+      bIsModalOpened,
+      handleModalClose,
+      handleModalOpen
     } = this.props;
 
     const { addedProducts } = this.state;
     return (
       <div className="App">
         <p className={classes.headline}>Find your food products</p>
-        <Button onClick={initiateBarcodeDetection} color="primary">
-          Start
+        <ModalComponent
+          bIsModalOpened={bIsModalOpened}
+          handleModalClose={handleModalClose}>
+          <div className={classes.scanModal}>
+            <Button onClick={initiateBarcodeDetection} color="primary">
+              Start
+            </Button>
+            <Button onClick={stopBarcodeDetection} color="secondary">
+              Stop
+            </Button>
+            <Camera bCameraHidden={bCameraHidden} />
+            <ScanProduct
+              strProductName={strProductName}
+              strProductPhoto={strProductPhoto}
+              strProductCategories={strProductCategories}
+              arrProductKeywords={arrProductKeywords}
+            />
+          </div>
+        </ModalComponent>
+        <Button onClick={handleModalOpen} color="secondary">
+          Open Modal
         </Button>
-        <Button onClick={stopBarcodeDetection} color="secondary">
-          Stop
-        </Button>
-        <Camera bCameraHidden={bCameraHidden} />
-        <ScanProduct
-          strProductName={strProductName}
-          strProductPhoto={strProductPhoto}
-          strProductCategories={strProductCategories}
-          arrProductKeywords={arrProductKeywords}
-        />
         <div className="summary">
           Added products:
           {addedProducts
@@ -83,6 +97,10 @@ class App extends Component {
 const styles = {
   headline: {
     fontSize: 20
+  },
+  scanModal: {
+    background: palette.green,
+    height: '100%'
   }
 };
 
@@ -90,4 +108,4 @@ App.propTypes = {
   bCameraHidden: PropTypes.bool
 };
 
-export default withStyles(styles)(withBarcode(App));
+export default withStyles(styles)(withModal(withBarcode(App)));

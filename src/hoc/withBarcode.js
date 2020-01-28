@@ -1,4 +1,4 @@
-import Quagga from 'quagga'; // ES6
+import Quagga from 'quagga';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchFoodFactsData } from '../actions/ActionFoodFacts';

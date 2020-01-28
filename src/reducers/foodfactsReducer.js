@@ -7,7 +7,7 @@ import {
 const objInitialState = {
   bLoading: false,
   nstrError: null,
-  objFoodfacts: []
+  objFoodfacts: {}
 };
 
 export default function foodFactsReducer(state = objInitialState, action) {

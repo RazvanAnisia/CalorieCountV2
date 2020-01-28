@@ -3,7 +3,10 @@ export default {
     display: 'none'
   },
   cameraContainer: {
-    width: 300,
-    height: 400
+    width: '100%',
+    height: 500,
+    '& video': {
+      width: '100%'
+    }
   }
 };
