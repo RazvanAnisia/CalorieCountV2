@@ -6,6 +6,12 @@ import PropTypes from 'prop-types';
 import { Camera, ScanProduct } from './components';
 import { ModalComponent } from './components/UI';
 import palette from './MaterialUi/Palette';
+import IconButton from '@material-ui/core/IconButton';
+import BarcodeIcon from './assets/icons/barcode-scanner.svg';
+import CloseIcon from './assets/icons/close-button.svg';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import { Grid } from '@material-ui/core';
 
 class App extends Component {
   state = {
@@ -54,22 +60,46 @@ class App extends Component {
           bIsModalOpened={bIsModalOpened}
           handleModalClose={handleModalClose}>
           <div className={classes.scanModal}>
-            <Button onClick={initiateBarcodeDetection} color="primary">
-              Start
-            </Button>
-            <Button onClick={stopBarcodeDetection} color="secondary">
-              Stop
-            </Button>
-            <Camera bCameraHidden={bCameraHidden} />
-            <ScanProduct
-              strProductName={strProductName}
-              strProductPhoto={strProductPhoto}
-              strProductCategories={strProductCategories}
-              arrProductKeywords={arrProductKeywords}
-            />
+            <Grid
+              container
+              justify="center"
+              alignItems="center"
+              direction="column">
+              <Typography noWrap variant="h6" align="center">
+                ADD NEW PRODUCT
+              </Typography>
+              <Camera
+                bCameraHidden={bCameraHidden}
+                stopBarcodeDetection={stopBarcodeDetection}
+              />
+              <TextField
+                id="filled-textarea"
+                label="Enter product barcode"
+                placeholder="Ex:4890008100309"
+                disableUnderline={true}
+              />
+              <IconButton onClick={initiateBarcodeDetection} color="primary">
+                <img alt={'barcode scanner'} src={BarcodeIcon}></img>
+              </IconButton>
+              <ScanProduct
+                strProductName={strProductName}
+                strProductPhoto={strProductPhoto}
+                strProductCategories={strProductCategories}
+                arrProductKeywords={arrProductKeywords}
+              />
+              <IconButton
+                onClick={() => {
+                  handleModalClose();
+                  stopBarcodeDetection();
+                }}
+                color="primary"
+                className={classes.closeButton}>
+                <img alt={'close button'} src={CloseIcon}></img>
+              </IconButton>
+            </Grid>
           </div>
         </ModalComponent>
-        <Button onClick={handleModalOpen} color="secondary">
+        <Button onClick={handleModalOpen} color="primary">
           Open Modal
         </Button>
         <div className="summary">
@@ -100,7 +130,13 @@ const styles = {
   },
   scanModal: {
     background: palette.green,
-    height: '100%'
+    height: '100%',
+    display: 'flex'
+  },
+  closeButton: {
+    position: 'absolute',
+    right: 20,
+    top: 20
   }
 };
 

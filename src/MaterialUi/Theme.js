@@ -12,6 +12,30 @@ const theme = createMuiTheme({
       paper: {
         height: 700
       }
+    },
+    MuiTextField: {
+      root: {
+        backgroundColor: palette.white,
+        borderRadius: '10px'
+      }
+    },
+    MuiButton: {
+      root: {
+        background: palette.purple,
+        borderRadius: 10,
+        '&:hover': {
+          background: palette.black
+        }
+      },
+      label: {
+        color: palette.white,
+        '&:active': {
+          color: palette.black
+        },
+        '&:hover': {
+          color: palette.black
+        }
+      }
     }
   }
 });
