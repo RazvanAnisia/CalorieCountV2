@@ -97,4 +97,4 @@ App.propTypes = {
   bCameraHidden: PropTypes.bool
 };
 
-export default withStyles(styles)(withModal(withBarcode(App)));
+export default withStyles(styles)(withModal(App));

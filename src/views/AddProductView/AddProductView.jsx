@@ -1,61 +1,100 @@
 import React, { Component } from 'react';
 
 import IconButton from '@material-ui/core/IconButton';
-
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
 import { Grid } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import { withBarcode } from '../../hoc';
 
-import { withBarcode, withModal } from '../../hoc';
-import { Camera, ScanProduct } from '../../components';
-import BarcodeIcon from '../../assets/icons/barcode-scanner.svg';
 import CloseIcon from '../../assets/icons/close-button.svg';
 import style from './style';
+import STEPS from './constants';
+import { Camera, ScanProduct } from '../../components';
+import { ChooseSearchMethod } from './components';
 
+const objSteps = [
+  STEPS.CHOOSE_SEARCH_METHOD,
+  STEPS.SCAN_BARCODE,
+  STEPS.PRODUCT_INFORMATION
+];
 class AddProductView extends Component {
-  //steps = [Add New Product, Scan Barcode, See Product Details && add quantity]
-  state = {};
-  render() {
+  state = {
+    step: objSteps[0]
+  };
+
+  isBackButtonDisabled = () => {
+    const { step } = this.state;
+    return step === STEPS.SCAN_BARCODE || STEPS.PRODUCT_INFORMATION;
+  };
+
+  handleBackButtonClick = () => {
+    const { step } = this.state;
+    this.setState(prevState => {});
+  };
+
+  handleNavigateToNextStep = () => {
+    const { step } = this.state;
+    const intIncrementedIndex = objSteps.indexOf(step) + 1;
+    const intMaxIndex = objSteps.length - 1;
+
+    this.setState({ step: objSteps[intIncrementedIndex] });
+  };
+
+  renderStep = () => {
+    const { step } = this.state;
     const {
-      handleModalClose,
-      classes,
       bCameraHidden,
       stopBarcodeDetection,
-      initiateBarcodeDetection,
       strProductCategories,
       strProductName,
       strProductPhoto,
-      arrProductKeywords
+      arrProductKeywords,
+      initiateBarcodeDetection
     } = this.props;
-    console.log(handleModalClose);
-    return (
-      <div className={classes.scanModal}>
-        <Grid container justify="center" alignItems="center" direction="column">
-          <Typography noWrap variant="h6" align="center">
-            ADD NEW PRODUCT
-          </Typography>
-          <Camera
-            bCameraHidden={bCameraHidden}
-            stopBarcodeDetection={stopBarcodeDetection}
+
+    const intCurrentIndex = objSteps.indexOf(this.state.step);
+    console.log(intCurrentIndex);
+    switch (step) {
+      case STEPS.CHOOSE_SEARCH_METHOD:
+        return (
+          <ChooseSearchMethod
+            handleNavigateToNextStep={this.handleNavigateToNextStep}
+            initiateBarcodeDetection={initiateBarcodeDetection}
           />
-          <TextField
-            id="filled-textarea"
-            label="Enter product barcode"
-            placeholder="Ex:4890008100309"
-            className={classes.addProductInput}
-          />
-          <Typography>OR USE BARCODE SCANNER</Typography>
-          <IconButton onClick={initiateBarcodeDetection} color="primary">
-            <img alt={'barcode scanner'} src={BarcodeIcon}></img>
-          </IconButton>
+        );
+      case STEPS.SCAN_BARCODE:
+        return '';
+      case STEPS.PRODUCT_INFORMATION:
+        return (
           <ScanProduct
             strProductName={strProductName}
             strProductPhoto={strProductPhoto}
             strProductCategories={strProductCategories}
             arrProductKeywords={arrProductKeywords}
           />
+        );
+      default:
+        return <h3>Error.Please try to reopen the modal.</h3>;
+    }
+  };
+  render() {
+    const {
+      handleModalClose,
+      classes,
+      bCameraHidden,
+      stopBarcodeDetection,
+      initiateBarcodeDetection
+    } = this.props;
+
+    return (
+      <div className={classes.scanModal}>
+        <Grid container justify="center" alignItems="center" direction="column">
+          <IconButton
+            disabled
+            onClick={this.isBackButtonDisabled()}
+            className={classes.backButton}>
+            <ArrowBackIosIcon />
+          </IconButton>
           <IconButton
             onClick={() => {
               handleModalClose();
@@ -65,6 +104,11 @@ class AddProductView extends Component {
             className={classes.closeButton}>
             <img alt={'close button'} src={CloseIcon}></img>
           </IconButton>
+          {this.renderStep()}
+          <Camera
+            bCameraHidden={bCameraHidden}
+            stopBarcodeDetection={stopBarcodeDetection}
+          />
         </Grid>
       </div>
     );
